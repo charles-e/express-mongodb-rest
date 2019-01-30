@@ -49,30 +49,37 @@ var defaultHandler = function(req, res, next, data) {
 			});
 		});
 	} else if (method == 'insertMany' || method == 'insertOne') {
-		
-		// (default_handler_call_insert) MongoDB insert
-		collection[method](query.docs, query.options, function(err) {
-			if (err) next(err);
-			res.json({status: 'success', code: 200});
-		});
-	} else if (method == 'updateMany' || method == 'updateOne') {
-		
-		// (default_handler_call_update) MongoDB update
-		collection[method](query.q, query.update, function(err) {
-			if (err) next(err);
-			res.json({status: 'success', code: 200});
-		});
-	} else if (method == 'deleteMany' || method == 'deleteOne') {
-		
-		// (default_handler_call_delete) MongoDB delete
-		collection[method](query.q, function(err) {
-			if (err) next(err);
-			if (err) next(err);
-			res.json({status: 'success', code: 200});
-		});
-	}
+	    // (default_handler_call_insert) MongoDB insert
+	    collection[method](query.docs, query.options, function(err, ok) {
+	      if (err) next(err);
+	      res.json({
+	        status: 'success',
+	        code: 200,
+	        mongo: ok
+	      });
+	    });
+	  } else if (method == 'updateMany' || method == 'updateOne') {
+	    // (default_handler_call_update) MongoDB update
+	    collection[method](query.q, query.update, function(err, ok) {
+	      if (err) next(err);
+	      res.json({
+	        status: 'success',
+	        code: 200,
+	        mongo: ok
+	      });
+	    });
+	  } else if (method == 'deleteMany' || method == 'deleteOne') {
+	    // (default_handler_call_delete) MongoDB delete
+	    collection[method](query.q, function(err, ok) {
+	      if (err) next(err);
+	      res.json({
+	        status: 'success',
+	        code: 200,
+	        mongo: ok
+	      });
+	    });
+		};
 };
-
 /**
  * Express middleware for MongoDB REST APIs
  *

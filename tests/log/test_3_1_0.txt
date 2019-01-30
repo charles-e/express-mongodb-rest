@@ -1,8 +1,8 @@
 TAP version 13
 # Tests for express-mongodb-rest (3.1.0)
-# Node.js (v7.9.0)
+# Node.js (v9.9.0)
 # Description: Express middleware for MongoDB REST APIs
-# Date: 2018-01-17 10:10:47
+# Date: 2019-01-29 04:36:10
 # Dependencies: mongodb (^3.0.0-rc0)
 # Developer: coveralls (^3.0.0), documentation (^5.3.3), dotenv (^4.0.0), express (^4.16.2), express-query-int (^2.0.0), istanbul (^0.4.5), moment (^2.19.1), supertest (^3.0.0), tape (^4.8.0)
 ok 1 (MAIN) insertMany
@@ -31,8 +31,59 @@ ok 20 (C) REST /rest POST
 ok 21 (C) REST /rest PUT
 ok 22 (C) REST /rest DELETE
 # (D) tests on custom app
-ok 23 (D) custom /custom GET
-ok 24 (D) custom /custom GET query
+not ok 23 (D) custom /custom GET
+  ---
+    operator: deepEqual
+    expected: |-
+      [ { _id: '5c50f17a5bd65e500ec1889d', lvl: 9999 }, { _id: '5c50f17a5bd65e500ec1889e', msg: 'itsover' } ]
+    actual: |-
+      []
+    at: collection.find.toArray.then.docs (/Users/ceubanks/Dev/express-mongodb-rest/tests/test.js:52:6)
+    stack: |-
+      Error: (D) custom /custom GET
+          at Test.assert [as _assert] (/Users/ceubanks/Dev/express-mongodb-rest/node_modules/tape/lib/test.js:224:54)
+          at Test.bound [as _assert] (/Users/ceubanks/Dev/express-mongodb-rest/node_modules/tape/lib/test.js:76:32)
+          at Test.tapeDeepEqual (/Users/ceubanks/Dev/express-mongodb-rest/node_modules/tape/lib/test.js:421:10)
+          at Test.bound [as deepEquals] (/Users/ceubanks/Dev/express-mongodb-rest/node_modules/tape/lib/test.js:76:32)
+          at collection.find.toArray.then.docs (/Users/ceubanks/Dev/express-mongodb-rest/tests/test.js:52:6)
+          at <anonymous>
+          at process._tickCallback (internal/process/next_tick.js:118:7)
+  ...
+not ok 24 (D) custom /custom GET query
+  ---
+    operator: deepEqual
+    expected: |-
+      [ { _id: '5c50f17a5bd65e500ec1889d', lvl: 9999 } ]
+    actual: |-
+      []
+    at: collection.find.toArray.then.docs (/Users/ceubanks/Dev/express-mongodb-rest/tests/test.js:52:6)
+    stack: |-
+      Error: (D) custom /custom GET query
+          at Test.assert [as _assert] (/Users/ceubanks/Dev/express-mongodb-rest/node_modules/tape/lib/test.js:224:54)
+          at Test.bound [as _assert] (/Users/ceubanks/Dev/express-mongodb-rest/node_modules/tape/lib/test.js:76:32)
+          at Test.tapeDeepEqual (/Users/ceubanks/Dev/express-mongodb-rest/node_modules/tape/lib/test.js:421:10)
+          at Test.bound [as deepEquals] (/Users/ceubanks/Dev/express-mongodb-rest/node_modules/tape/lib/test.js:76:32)
+          at collection.find.toArray.then.docs (/Users/ceubanks/Dev/express-mongodb-rest/tests/test.js:52:6)
+          at <anonymous>
+          at process._tickCallback (internal/process/next_tick.js:118:7)
+  ...
 ok 25 (D) custom /custom GET unknown collection
-ok 26 (D) custom /custom GET count
+not ok 26 (D) custom /custom GET count
+  ---
+    operator: deepEqual
+    expected: |-
+      { count: 1 }
+    actual: |-
+      { count: 0 }
+    at: request.get.then.res (/Users/ceubanks/Dev/express-mongodb-rest/tests/test.js:726:9)
+    stack: |-
+      Error: (D) custom /custom GET count
+          at Test.assert [as _assert] (/Users/ceubanks/Dev/express-mongodb-rest/node_modules/tape/lib/test.js:224:54)
+          at Test.bound [as _assert] (/Users/ceubanks/Dev/express-mongodb-rest/node_modules/tape/lib/test.js:76:32)
+          at Test.tapeDeepEqual (/Users/ceubanks/Dev/express-mongodb-rest/node_modules/tape/lib/test.js:421:10)
+          at Test.bound [as deepEquals] (/Users/ceubanks/Dev/express-mongodb-rest/node_modules/tape/lib/test.js:76:32)
+          at request.get.then.res (/Users/ceubanks/Dev/express-mongodb-rest/tests/test.js:726:9)
+          at <anonymous>
+          at process._tickCallback (internal/process/next_tick.js:118:7)
+  ...
 ok 27 (MAIN) Drop MongoDB database
