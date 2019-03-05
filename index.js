@@ -50,8 +50,10 @@ var defaultHandler = function(req, res, next, data) {
     });
   } else if (method == 'insertMany' || method == 'insertOne') {
     // (default_handler_call_insert) MongoDB insert
-    if (query.docs == undefined){
-      query.docs = req.body
+    if (query['docs'] == undefined){
+      query['docs'] = req.body
+      debug('docs in the body!')
+      debug(req.body)
     }
     collection[method](query.docs, query.options, function(err, ok) {
       if (err) {
