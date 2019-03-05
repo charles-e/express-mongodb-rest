@@ -350,7 +350,6 @@ module.exports = function(options) {
       console.log('look in body')
       rest.query = {'docs' : JSON.parse(req.body) }
       console.log(rest.query)
-
     }
     // (middleware_deny) Check for denied databases, collections, and methods
     deny(rest.database, options.express.deny.database, options.express.deny.code, res); // deny databases
@@ -364,6 +363,7 @@ module.exports = function(options) {
 
     // (middleware_call) Call methods handler
     if (rest.query !== undefined && Object.keys(rest.query).length > 0) {
+      console.log('gonna call handler')
       var data = {};
       data.rest = rest;
       data.mongodb = {};
