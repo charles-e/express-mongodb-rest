@@ -51,9 +51,9 @@ var defaultHandler = function(req, res, next, data) {
   } else if (method == 'insertMany' || method == 'insertOne') {
     // (default_handler_call_insert) MongoDB insert
     if (query['docs'] == undefined){
-      query['docs'] = req.body
-      debug('docs in the body!')
-      debug(req.body)
+      query['docs'] = JSON.parse(req.body)
+      console.log('docs in the body!')
+      console.log(req.body)
     }
     collection[method](query.docs, query.options, function(err, ok) {
       if (err) {
@@ -345,8 +345,11 @@ module.exports = function(options) {
     if (Object.keys(req.query).length > 0) {
       rest.query = req.query;
     };
-    rest.query = options.express.parse(rest.query);
-
+    rest.query = options.express.parse(rest.query); // HERE!!!!
+    if (rest.query == undefined){
+      console.log('look in body')
+      rest.query['docs'] = JSON.parse(req.body)
+    }
     // (middleware_deny) Check for denied databases, collections, and methods
     deny(rest.database, options.express.deny.database, options.express.deny.code, res); // deny databases
     deny(rest.collection, options.express.deny.collection, options.express.deny.code, res); // deny collections
