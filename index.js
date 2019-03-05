@@ -55,11 +55,11 @@ var defaultHandler = function(req, res, next, data) {
         next(err);
       } else {
         res.json({
-            status: 'success',
-            code: 200,
-            mongo: ok
-          }
+          status: 'success',
+          code: 200,
+          mongo: ok
         });
+      }
     });
   } else if (method == 'updateMany' || method == 'updateOne') {
     // (default_handler_call_update) MongoDB update
