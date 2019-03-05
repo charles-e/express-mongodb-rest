@@ -6,79 +6,82 @@ var mongoClient = require('mongodb').MongoClient;
 
 // (deny) Function for denying access to databases, collections, and methods
 var deny = function(target, denied, code, res) {
-	if (denied.indexOf(target) > -1) {
-		res.status(code);
-	}
+  if (denied.indexOf(target) > -1) {
+    res.status(code);
+  }
 };
 
 // (allow) Function for allowing access to databases, collections, and methods
 var allow = function(target, allowed, code, res) {
-	if (!(allowed.indexOf(target) > -1) && allowed.length > 0) {
-		res.status(code);
-	}
+  if (!(allowed.indexOf(target) > -1) && allowed.length > 0) {
+    res.status(code);
+  }
 };
 
 // (default_parse) Default function for parsing express query string keys to JSON
 var defaultParse = function(query) {
-	for (var k in query) {
-		if (typeof query[k] == 'string') {
-			query[k] = JSON.parse(query[k]);
-		}
-	}
-	return query;
+  for (var k in query) {
+    if (typeof query[k] == 'string') {
+      query[k] = JSON.parse(query[k]);
+    }
+  }
+  return query;
 };
 
 // (default_handler) Default function for handling responses for a collection method
 var defaultHandler = function(req, res, next, data) {
-	
-	// (default_handler_variables) Setup required variables
-	var collection = data.mongodb.collection;
-	var method = data.rest.method;
-	var query = data.rest.query;
-	
-	// (default_handler_call) Handle common MongoDB functions
-	var keys;
-	if (method == 'find' || method == 'findOne') {
-		
-		// (default_handler_call_find) MongoDB Find
-		collection[method](query.q, query.options, function(err, cursor) {
-			if (err) next(err);
-			cursor.toArray(function(err, docs) {
-				if (err) next(err);
-				res.json(docs);
-			});
-		});
-	} else if (method == 'insertMany' || method == 'insertOne') {
-	    // (default_handler_call_insert) MongoDB insert
-	    collection[method](query.docs, query.options, function(err, ok) {
-	      if (err) next(err);
-	      res.json({
-	        status: 'success',
-	        code: 200,
-	        mongo: ok
-	      });
-	    });
-	  } else if (method == 'updateMany' || method == 'updateOne') {
-	    // (default_handler_call_update) MongoDB update
-	    collection[method](query.q, query.update, function(err, ok) {
-	      if (err) next(err);
-	      res.json({
-	        status: 'success',
-	        code: 200,
-	        mongo: ok
-	      });
-	    });
-	  } else if (method == 'deleteMany' || method == 'deleteOne') {
-	    // (default_handler_call_delete) MongoDB delete
-	    collection[method](query.q, function(err, ok) {
-	      if (err) next(err);
-	      res.json({
-	        status: 'success',
-	        code: 200,
-	        mongo: ok
-	      });
-	    });
-		};
+
+  // (default_handler_variables) Setup required variables
+  var collection = data.mongodb.collection;
+  var method = data.rest.method;
+  var query = data.rest.query;
+
+  // (default_handler_call) Handle common MongoDB functions
+  var keys;
+  if (method == 'find' || method == 'findOne') {
+
+    // (default_handler_call_find) MongoDB Find
+    collection[method](query.q, query.options, function(err, cursor) {
+      if (err) next(err);
+      cursor.toArray(function(err, docs) {
+        if (err) next(err);
+        res.json(docs);
+      });
+    });
+  } else if (method == 'insertMany' || method == 'insertOne') {
+    // (default_handler_call_insert) MongoDB insert
+    collection[method](query.docs, query.options, function(err, ok) {
+      if (err) {
+        next(err);
+      } else {
+        res.json({
+            status: 'success',
+            code: 200,
+            mongo: ok
+          }
+        });
+    });
+  } else if (method == 'updateMany' || method == 'updateOne') {
+    // (default_handler_call_update) MongoDB update
+    collection[method](query.q, query.update, function(err, ok) {
+      if (err) next(err);
+      res.json({
+        status: 'success',
+        code: 200,
+        mongo: ok
+      });
+    });
+  } else if (method == 'deleteMany' || method == 'deleteOne') {
+    // (default_handler_call_delete) MongoDB delete
+    collection[method](query.q, function(err, ok) {
+      if (err) next(err);
+      res.json({
+        status: 'success',
+        code: 200,
+        mongo: ok
+      });
+    });
+  };
 };
 /**
  * Express middleware for MongoDB REST APIs
@@ -222,7 +225,7 @@ var defaultHandler = function(req, res, next, data) {
  * options.rest.GET = {};
  * options.rest.GET.method = 'find';
  * options.rest.GET.query = {q: {}}; // return all if no query string provided
- * 
+ *
  * // (options_get_limit) Limit number of documents for GET to 100
  * options.rest.GET.handler = {};
  * options.rest.GET.handler.find = function(req, res, next, data) {
@@ -247,7 +250,7 @@ var defaultHandler = function(req, res, next, data) {
  *     res.json({count: result};
  *   });
  * };
- * 
+ *
  * // (options_post) POST options
  * options.rest.POST = {};
  * options.rest.POST.method = 'insertMany';
@@ -274,91 +277,93 @@ var defaultHandler = function(req, res, next, data) {
  *
  */
 module.exports = function(options) {
-	options = options || {};
-	
-	// (options_express) Default express options
-	options.express = options.express || {};
-	options.express.database = options.express.database || 'database';
-	options.express.collection = options.express.collection || 'collection';
-	options.express.method = options.express.method || 'method';
-	options.express.parse = options.express.parse || defaultParse;
-	options.express.handler = options.express.handler || defaultHandler;
-	options.express.deny = options.express.deny || {};
-	options.express.deny.database = options.express.deny.database || ['admin'];
-	options.express.deny.collection = options.express.deny.collection || [];
-	options.express.deny.method = options.express.deny.method || [];
-	options.express.deny.code = options.express.deny.code || 400;
-	options.express.allow = options.express.allow || {};
-	options.express.allow.database = options.express.allow.database || [];
-	options.express.allow.collection = options.express.allow.collection || [];
-	options.express.allow.method = options.express.allow.method || [];
-	options.express.allow.code = options.express.allow.code || 400;
-	
-	// (options_mongodb) Default mongodb options
-	options.mongodb = options.mongodb || {};
-	options.mongodb.connection = options.mongodb.connection || process.env.MONGODB_CONNECTION || 'mongodb://localhost:27017';
-	options.mongodb.options = options.mongodb.options || process.env.MONGODB_OPTIONS;
-	options.mongodb.database = options.mongodb.database || process.env.MONGODB_DATABASE || 'test';
-	options.mongodb.collection = options.mongodb.collection || process.env.MONGODB_COLLECTION || 'express_mongodb_rest';
-	
-	// (options_mongodb_parse) Parse defaults if needed
-	if (typeof options.mongodb.options == 'string') {
-		options.mongodb.options = JSON.parse(options.mongodb.options);
-	}
-	
-	// (options_rest) Default REST options
-	options.rest = options.rest || {'GET': {}};
-	for (var METHOD in options.rest) {
-		
-		// (options_rest_defaults) Set default REST options
-		options.rest[METHOD].database = options.rest[METHOD].database || options.mongodb.database;
-		options.rest[METHOD].collection = options.rest[METHOD].collection || options.mongodb.collection;
-		options.rest[METHOD].method = options.rest[METHOD].method || 'find';
-		options.rest[METHOD].handler = options.rest[METHOD].handler || {};
-		options.rest[METHOD].handler[options.rest[METHOD].method] = options.rest[METHOD].handler[options.rest[METHOD].method] || options.express.handler;
-	}
-	
-	// (mongodb) Connect to mongodb using connection pooling
-	var Client;
-	mongoClient.connect(options.mongodb.connection, options.mongodb.options, function(err, client) {
-		Client = client;
-	});
-	
-	// (middleware) Express middleware function 
-	var middleware = function(req, res, next) {
-		
-		// (middleware_options) Setup REST 
-		var rest = options.rest[req.method];
-		rest.database = req.params[options.express.database] || rest.database;
-		rest.collection = req.params[options.express.collection]|| rest.collection;
-		rest.method = req.params[options.express.method] || rest.method;
-		if (Object.keys(req.query).length > 0) {
-			rest.query = req.query;
-		};
-		rest.query = options.express.parse(rest.query);
-		
-		// (middleware_deny) Check for denied databases, collections, and methods
-		deny(rest.database, options.express.deny.database,  options.express.deny.code, res); // deny databases
-		deny(rest.collection, options.express.deny.collection,  options.express.deny.code, res); // deny collections
-		deny(rest.method, options.express.deny.method,  options.express.deny.code, res); // deny methods
-		
-		// (middleware_allow) Check for allowed databases, collections, and methods
-		allow(rest.database, options.express.allow.database,  options.express.allow.code, res); // not allowed databases
-		allow(rest.collection, options.express.allow.collection,  options.express.allow.code, res); // not allowed collections
-		allow(rest.method, options.express.allow.method,  options.express.allow.code, res); // not allowed methods
-		
-		// (middleware_call) Call methods handler
-		if (rest.query !== undefined && Object.keys(rest.query).length > 0) {
-			var data = {};
-			data.rest = rest;
-			data.mongodb = {};
-			data.mongodb.client = Client;
-			data.mongodb.database = data.mongodb.client.db(rest.database);
-			data.mongodb.collection = data.mongodb.database.collection(rest.collection);
-			rest.handler[rest.method](req, res, next, data);
-		} else {
-			res.end();
-		}
-	};
-	return(middleware);
+  options = options || {};
+
+  // (options_express) Default express options
+  options.express = options.express || {};
+  options.express.database = options.express.database || 'database';
+  options.express.collection = options.express.collection || 'collection';
+  options.express.method = options.express.method || 'method';
+  options.express.parse = options.express.parse || defaultParse;
+  options.express.handler = options.express.handler || defaultHandler;
+  options.express.deny = options.express.deny || {};
+  options.express.deny.database = options.express.deny.database || ['admin'];
+  options.express.deny.collection = options.express.deny.collection || [];
+  options.express.deny.method = options.express.deny.method || [];
+  options.express.deny.code = options.express.deny.code || 400;
+  options.express.allow = options.express.allow || {};
+  options.express.allow.database = options.express.allow.database || [];
+  options.express.allow.collection = options.express.allow.collection || [];
+  options.express.allow.method = options.express.allow.method || [];
+  options.express.allow.code = options.express.allow.code || 400;
+
+  // (options_mongodb) Default mongodb options
+  options.mongodb = options.mongodb || {};
+  options.mongodb.connection = options.mongodb.connection || process.env.MONGODB_CONNECTION || 'mongodb://localhost:27017';
+  options.mongodb.options = options.mongodb.options || process.env.MONGODB_OPTIONS;
+  options.mongodb.database = options.mongodb.database || process.env.MONGODB_DATABASE || 'test';
+  options.mongodb.collection = options.mongodb.collection || process.env.MONGODB_COLLECTION || 'express_mongodb_rest';
+
+  // (options_mongodb_parse) Parse defaults if needed
+  if (typeof options.mongodb.options == 'string') {
+    options.mongodb.options = JSON.parse(options.mongodb.options);
+  }
+
+  // (options_rest) Default REST options
+  options.rest = options.rest || {
+    'GET': {}
+  };
+  for (var METHOD in options.rest) {
+
+    // (options_rest_defaults) Set default REST options
+    options.rest[METHOD].database = options.rest[METHOD].database || options.mongodb.database;
+    options.rest[METHOD].collection = options.rest[METHOD].collection || options.mongodb.collection;
+    options.rest[METHOD].method = options.rest[METHOD].method || 'find';
+    options.rest[METHOD].handler = options.rest[METHOD].handler || {};
+    options.rest[METHOD].handler[options.rest[METHOD].method] = options.rest[METHOD].handler[options.rest[METHOD].method] || options.express.handler;
+  }
+
+  // (mongodb) Connect to mongodb using connection pooling
+  var Client;
+  mongoClient.connect(options.mongodb.connection, options.mongodb.options, function(err, client) {
+    Client = client;
+  });
+
+  // (middleware) Express middleware function
+  var middleware = function(req, res, next) {
+
+    // (middleware_options) Setup REST
+    var rest = options.rest[req.method];
+    rest.database = req.params[options.express.database] || rest.database;
+    rest.collection = req.params[options.express.collection] || rest.collection;
+    rest.method = req.params[options.express.method] || rest.method;
+    if (Object.keys(req.query).length > 0) {
+      rest.query = req.query;
+    };
+    rest.query = options.express.parse(rest.query);
+
+    // (middleware_deny) Check for denied databases, collections, and methods
+    deny(rest.database, options.express.deny.database, options.express.deny.code, res); // deny databases
+    deny(rest.collection, options.express.deny.collection, options.express.deny.code, res); // deny collections
+    deny(rest.method, options.express.deny.method, options.express.deny.code, res); // deny methods
+
+    // (middleware_allow) Check for allowed databases, collections, and methods
+    allow(rest.database, options.express.allow.database, options.express.allow.code, res); // not allowed databases
+    allow(rest.collection, options.express.allow.collection, options.express.allow.code, res); // not allowed collections
+    allow(rest.method, options.express.allow.method, options.express.allow.code, res); // not allowed methods
+
+    // (middleware_call) Call methods handler
+    if (rest.query !== undefined && Object.keys(rest.query).length > 0) {
+      var data = {};
+      data.rest = rest;
+      data.mongodb = {};
+      data.mongodb.client = Client;
+      data.mongodb.database = data.mongodb.client.db(rest.database);
+      data.mongodb.collection = data.mongodb.database.collection(rest.collection);
+      rest.handler[rest.method](req, res, next, data);
+    } else {
+      res.end();
+    }
+  };
+  return (middleware);
 };
