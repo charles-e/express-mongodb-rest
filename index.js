@@ -348,7 +348,7 @@ module.exports = function(options) {
     rest.query = options.express.parse(rest.query); // HERE!!!!
     if (rest.query == undefined){
       console.log('look in body')
-      rest.query['docs'] = JSON.parse(req.body)
+      rest.query = {'docs' : JSON.parse(req.body) }
     }
     // (middleware_deny) Check for denied databases, collections, and methods
     deny(rest.database, options.express.deny.database, options.express.deny.code, res); // deny databases
