@@ -353,11 +353,7 @@ module.exports = function(options) {
     }
     console.log(`rest.query = ${rest.query}`)
     rest.query = options.express.parse(rest.query); // HERE!!!!
-    if (rest.query == undefined){
-      console.log('look in body')
-      rest.query = {'docs' : JSON.parse(req.body) }
-      console.log(rest.query)
-    }
+
     // (middleware_deny) Check for denied databases, collections, and methods
     deny(rest.database, options.express.deny.database, options.express.deny.code, res); // deny databases
     deny(rest.collection, options.express.deny.collection, options.express.deny.code, res); // deny collections
@@ -369,16 +365,22 @@ module.exports = function(options) {
     allow(rest.method, options.express.allow.method, options.express.allow.code, res); // not allowed methods
 
     // (middleware_call) Call methods handler
-    if (rest.query !== undefined && Object.keys(rest.query).length > 0) {
+    if ((rest.query !== undefined && Object.keys(rest.query).length > 0) ||
+    (req.body !== undefined)) {
       console.log('gonna call handler')
       var data = {};
       data.rest = rest;
+      if (rest.query == undefined){
+        console.log('look in body')
+        data.rest.query = {'docs' : JSON.parse(req.body) }
+        console.log(rest.query)
+      }
       data.mongodb = {};
       data.mongodb.client = Client;
       data.mongodb.database = data.mongodb.client.db(rest.database);
       data.mongodb.collection = data.mongodb.database.collection(rest.collection);
       rest.handler[rest.method](req, res, next, data);
-      delete(rest.query)
+      //delete(rest.query)
     } else {
       res.end();
     }
