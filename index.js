@@ -88,7 +88,7 @@ var defaultHandler = function(req, res, next, data) {
       });
     });
   };
-  rest.query
+  delete(rest.query)
 };
 /**
  * Express middleware for MongoDB REST APIs
