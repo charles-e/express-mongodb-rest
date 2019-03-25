@@ -30,6 +30,7 @@ var defaultParse = function(query) {
 
 // (default_handler) Default function for handling responses for a collection method
 var defaultHandler = function(req, res, next, data) {
+  console.log(`query.docs = ${query.docs}`)
 
   // (default_handler_variables) Setup required variables
   var collection = data.mongodb.collection;
@@ -343,6 +344,7 @@ module.exports = function(options) {
     rest.database = req.params[options.express.database] || rest.database;
     rest.collection = req.params[options.express.collection] || rest.collection;
     rest.method = req.params[options.express.method] || rest.method;
+
     if (Object.keys(req.query).length > 0) {
       rest.query = req.query;
     };
@@ -372,7 +374,7 @@ module.exports = function(options) {
       data.mongodb.database = data.mongodb.client.db(rest.database);
       data.mongodb.collection = data.mongodb.database.collection(rest.collection);
       rest.handler[rest.method](req, res, next, data);
-      delete(rest.query) 
+      delete(rest.query)
     } else {
       res.end();
     }
