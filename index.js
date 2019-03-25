@@ -346,8 +346,12 @@ module.exports = function(options) {
     rest.method = req.params[options.express.method] || rest.method;
 
     if (Object.keys(req.query).length > 0) {
+      console.log('setting rest.query')
       rest.query = req.query;
-    };
+    }else{
+      console.log('not setting rest.query')
+    }
+    console.log(`rest.query = ${rest.query}`)
     rest.query = options.express.parse(rest.query); // HERE!!!!
     if (rest.query == undefined){
       console.log('look in body')
