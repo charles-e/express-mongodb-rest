@@ -87,6 +87,7 @@ var defaultHandler = function(req, res, next, data) {
       });
     });
   };
+  rest.query
 };
 /**
  * Express middleware for MongoDB REST APIs
@@ -371,6 +372,7 @@ module.exports = function(options) {
       data.mongodb.database = data.mongodb.client.db(rest.database);
       data.mongodb.collection = data.mongodb.database.collection(rest.collection);
       rest.handler[rest.method](req, res, next, data);
+      delete(rest.query) 
     } else {
       res.end();
     }
