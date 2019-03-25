@@ -30,12 +30,12 @@ var defaultParse = function(query) {
 
 // (default_handler) Default function for handling responses for a collection method
 var defaultHandler = function(req, res, next, data) {
-  console.log(`query.docs = ${query.docs}`)
 
   // (default_handler_variables) Setup required variables
   var collection = data.mongodb.collection;
   var method = data.rest.method;
   var query = data.rest.query;
+  console.log(`query.docs = ${query.docs}`)
 
   // (default_handler_call) Handle common MongoDB functions
   var keys;
