@@ -56,7 +56,7 @@ var defaultHandler = function(req, res, next, data) {
       console.log('docs in the body!')
       console.log(req.body)
     }
-    collection[method](query.docs, query.options, function(err, ok) {
+    collection[method](JSON.parse(req.body), query.options, function(err, ok) {
       if (err) {
         next(err);
       } else {
